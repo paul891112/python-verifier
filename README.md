@@ -2,17 +2,17 @@
 
 
 
-Setup function ()
+# Setup function ()
 
 This funciton creates two files, one called test1.txt, with a string "Hello world" as content, another file called test2.txt with no content.
 
 
-Teardown function (Paul)
+# Teardown function (Paul)
 
 This function takes two arguments, parameter 1 is a string with the name of the .txt file created in setup function, parameter 2 is an optional parameter that represents the name of 
 
 
-Testing functions
+# Testing functions
 
 Test read_file()
 We create two calls, one reads test1.txt, one reads test2.txt. Both should pass. 
