@@ -1,39 +1,99 @@
+#2-3 tests for each function
+
+import os
+import pprint as pp
 import file_manager as fm
+import time
 
-def setup(file_name1, file_name2):
-    file1=open(file_name1,"w")
-    file1.write("Hello World")
-    file1.close()
-    file2=open(file_name2,"w")
-    file2.close()
+def setup():
+    return
 
-setup("Test1","Test2") #how do we do with filenames?, global variables or with a finder?(if it exists
+def test_create_file1():
+    filepath = "C:\Dateien\SWcon\Assignment 1\test.txt"
+    res = fm.create_file(filepath, "content is not empty")
+    assert res == True
+    
+def test_create_file2():
+    filepath = "C:\Dateien\SWcon\Assignment 1\test.txt"
+    res = fm.create_file(filepath)
+    assert res == True
+    with open(filepath, 'r') as f:
+        lines = f.read()
+    assert lines == ""
 
-def test_read_file1():
-    content=fm.read_file("Test1")
-    assert content=="Hello World"
+def test_create_file21():
+    filepath = "C:\Dateien\SWcon\Assignment 1\test.txt"
+    res = fm.create_file(filepath, "content is not empty")
+    assert res == True
+    with open(filepath, 'r') as f:
+        lines = f.read()
+    assert lines == "content is not empty"
 
-def test_read_file2():
-    assert fm.read_file("NonExistenFile")==None
 
-def test_read_file3():
-    content=fm.read_file("Test2")
-    assert content==""
+def test_create_file3(str):
+    filepath = 123
+    res = fm.create_file(filepath)
+    assert res == False
+
+
+    
+
+def teardown(directory = ''): #delete unwanted .txt files? Assume there are no .txt files in directory?
+    '''
+    Removes all .txt file in the current working directory or optional file path, return None
+    '''
+    if directory == '':
+        directory = os.getcwd()
+    txt_files = [f for f in os.listdir(directory) if f.endswith('.txt')]
+
+    for f in txt_files:
+        os.remove(f)
+
+def teardown(file_name1, file_name2, optfile_name=""): #how to pass the filenames?
+    '''
+    Takes two arguments and one optional argument
+    arg1: file path of first file in setup 
+    arg2: file path of second file in setup
+    arg3: optional argument, path of created file in create_file to be deleted
+    '''
+
+    if os.path.exists(file_name1):
+        os.remove(file_name1)
+    if os.path.exists(file_name2):
+        os.remove(file_name2)
+    if os.path.exists(optfile_name):
+        os.remove(optfile_name)
+
+
+#---------09.10-------------------------------------------------
 
 def run_tests():
-    results = {"pass":0,"fail":0,"error":0}
-    all_tests = find_tests("test_")
+    results = {"pass":0, "fail":0, "error":0}
+    prefix = get_testname() # returns the pattern of testname
+    all_tests = find_tests(prefix)
     for test in all_tests:
         try:
+            setup()
+            st = time.time()
             test()
             results["pass"] += 1
         except AssertionError:
             results["fail"] = results["fail"] + 1
         except Exception:
             results["error"] += 1
+        finally:
+            et = time.time()
+            print("Testing time: ", et-st)
+            teardown() 
     print(f"pass {results['pass']}")
     print(f"fail {results['fail']}")
     print(f"error {results['error']}")
+    
+def get_testname():
+    '''
+    Handles the -s or --select
+    '''
+    return
 
 def find_tests(prefix):
     tests = []
@@ -42,4 +102,3 @@ def find_tests(prefix):
             tests.append(func)
     return tests
 
-run_tests()
