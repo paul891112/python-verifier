@@ -6,7 +6,31 @@ import file_manager as fm
 import time
 
 def setup():
-    return
+    p = os.getcwd()
+    d_name = "TESTS"
+    counter = 1
+    while os.path.isdir(d_name):
+        d_name = d_name[:5] + str(counter)
+        counter += 1
+    os.makedirs(d_name)
+    dir_path= os.getcwd()+fr"\{d_name}"
+    with open(dir_path+r"\test_file1.txt","w") as file1:
+        file1.write("Hello World")
+
+    file2=open(dir_path+r"\test_file2.txt","w")
+    file2.close()
+
+    return dir_path
+def test_read_file1(path):
+    content=fm.read_file(path+r"\test_file1.txt")
+    assert content=="Hello World"
+
+def test_read_file2(path):
+    assert fm.read_file(path+r"\NonExistenFile.txt")==None
+
+def test_read_file3(path):
+    content=fm.read_file(path+r"\test_file2.txt")
+    assert content==""
 
 def test_create_file1():
     filepath = "C:\Dateien\SWcon\Assignment 1\test.txt"
