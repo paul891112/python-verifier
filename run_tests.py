@@ -4,6 +4,9 @@ import os
 import pprint as pp
 import file_manager as fm
 import time
+import shutil
+import sys
+
 
 def setup():
     p = os.getcwd()
@@ -32,64 +35,51 @@ def test_read_file3(path):
     content=fm.read_file(path+r"\test_file2.txt")
     assert content==""
 
-def test_create_file1():
-    filepath = "C:\Dateien\SWcon\Assignment 1\test.txt"
+#--------Test create_file - all 4 tested, they all do what they should-------------
+def test_create_file1(cwd_path):
+
+    filepath = cwd_path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
+    print("1 success")
     assert res == True
     
-def test_create_file2():
-    filepath = "C:\Dateien\SWcon\Assignment 1\test.txt"
+def test_create_file2(cwd_path):
+    filepath = cwd_path + "/create.txt"
     res = fm.create_file(filepath)
+    print("2 success")
     assert res == True
     with open(filepath, 'r') as f:
         lines = f.read()
     assert lines == ""
 
-def test_create_file21():
-    filepath = "C:\Dateien\SWcon\Assignment 1\test.txt"
+def test_create_file21(cwd_path):
+    filepath = cwd_path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
+    print("21 success")
     assert res == True
     with open(filepath, 'r') as f:
         lines = f.read()
     assert lines == "content is not empty"
 
 
-def test_create_file3(str):
+def test_create_file3(cwd_path):
     filepath = 123
     res = fm.create_file(filepath)
+    print("3 success")
     assert res == False
 
+#--------End of Test create_file -----------------------------------
 
     
 
-def teardown(directory = ''): #delete unwanted .txt files? Assume there are no .txt files in directory?
+def teardown(directory = ''):
     '''
-    Removes all .txt file in the current working directory or optional file path, return None
+    deletes the directory, returns None
     '''
-    if directory == '':
-        directory = os.getcwd()
-    txt_files = [f for f in os.listdir(directory) if f.endswith('.txt')]
-
-    for f in txt_files:
-        os.remove(f)
-
-def teardown(file_name1, file_name2, optfile_name=""): #how to pass the filenames?
-    '''
-    Takes two arguments and one optional argument
-    arg1: file path of first file in setup 
-    arg2: file path of second file in setup
-    arg3: optional argument, path of created file in create_file to be deleted
-    '''
-
-    if os.path.exists(file_name1):
-        os.remove(file_name1)
-    if os.path.exists(file_name2):
-        os.remove(file_name2)
-    if os.path.exists(optfile_name):
-        os.remove(optfile_name)
+    shutil.rmtree(directory)
 
 
-#---------09.10-------------------------------------------------
+#---------11.10-------------------------------------------------
 
 def run_tests():
     results = {"pass":0, "fail":0, "error":0}
@@ -97,7 +87,7 @@ def run_tests():
     all_tests = find_tests(prefix)
     for test in all_tests:
         try:
-            setup()
+            cwd_path = setup()
             st = time.time()
             test()
             results["pass"] += 1
@@ -108,21 +98,47 @@ def run_tests():
         finally:
             et = time.time()
             print("Testing time: ", et-st)
-            teardown() 
+            teardown(cwd_path) 
     print(f"pass {results['pass']}")
     print(f"fail {results['fail']}")
     print(f"error {results['error']}")
     
 def get_testname():
     '''
-    Handles the -s or --select
+    Handles the -s or --select.
+
+    Args:
+        -
+
+    Returns:
+        str: "test_" if not specified, the pattern "PATTERN" after -s or --select, raises exception otherwise
     '''
-    return
+    if len(sys.argv) < 2:
+        return "test_"
+    elif len(sys.argv == 3):
+        code = sys.argv[1]
+        pattern = sys.argv[2]
+        if code == '-s' or code == '--select':
+            return pattern
+        else:
+            raise Exception("Usage: run_tests.py -s pattern or runtests.py --select pattern")
+    else:
+        raise Exception("Usage: run_tests.py -s pattern or runtests.py --select pattern")
+
+
 
 def find_tests(prefix):
     tests = []
     for (name, func) in globals().items():
-        if name.startswith(prefix):
+        if prefix in name:
             tests.append(func)
     return tests
 
+def main():
+    run_tests()
+
+
+if __name__ == "__main__":
+    main()
+
+#------end of 11.10------------------------------------------
