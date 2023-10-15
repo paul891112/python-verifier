@@ -1,11 +1,11 @@
 #2-3 tests for each function
 
 import os
-import pprint as pp
 import file_manager as fm
 import time
 import shutil
 import sys
+from colorama import Fore
 
 
 def setup():
@@ -24,14 +24,14 @@ def setup():
     file2.close()
 
     return dir_path
-def test_read_file1(path):
+def test_read_file_correct(path):
     content=fm.read_file(path+r"\test_file1.txt")
     assert content=="Hello World"
 
-def test_read_file2(path):
+def test_read_file_None(path):
     assert fm.read_file(path+r"\NonExistenFile.txt")==None
 
-def test_read_file3(path):
+def test_read_file_empty(path):
     content=fm.read_file(path+r"\test_file2.txt")
     assert content==""
 
@@ -40,13 +40,11 @@ def test_create_file1(path):
 
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
-    print("1 success")
     assert res == True
     
 def test_create_file2(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath)
-    print("2 success")
     assert res == True
     with open(filepath, 'r') as f:
         lines = f.read()
@@ -55,7 +53,6 @@ def test_create_file2(path):
 def test_create_file21(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
-    print("21 success")
     assert res == True
     with open(filepath, 'r') as f:
         lines = f.read()
@@ -65,7 +62,6 @@ def test_create_file21(path):
 def test_create_file3(path):
     filepath = 123
     res = fm.create_file(filepath)
-    print("3 success")
     assert res == False
 
 #--------End of Test create_file -----------------------------------
@@ -104,22 +100,30 @@ def run_tests():
     prefix = get_testname() # returns the pattern of testname
     all_tests = find_tests(prefix)
     for test in all_tests:
+        comment=""
         try:
             cwd_path = setup()
             st = time.time()
             test(cwd_path)
             results["pass"] += 1
+            comment+=Fore.GREEN+"pass"
         except AssertionError:
             results["fail"] = results["fail"] + 1
+            comment+=Fore.RED+"fail"
         except Exception:
             results["error"] += 1
+            comment+=Fore.LIGHTYELLOW_EX+"error"
         finally:
             et = time.time()
-            print("Testing time: ", et-st)
-            teardown(cwd_path) 
-    print(f"pass {results['pass']}")
-    print(f"fail {results['fail']}")
-    print(f"error {results['error']}")
+            t=(et-st)*1000
+            #print("Testing time: ", et-st)
+            teardown(cwd_path)
+            print(Fore.LIGHTWHITE_EX+f"Test: {test} ran in {round(t,2)} ms, status: {comment}")
+    print(Fore.LIGHTWHITE_EX+"#------Final Status------#")
+    print(Fore.GREEN+f"pass: {results['pass']}")
+    print(Fore.LIGHTYELLOW_EX + f"error: {results['error']}")
+    print(Fore.RED+f"fail: {results['fail']}")
+
     
 def get_testname():
     '''
