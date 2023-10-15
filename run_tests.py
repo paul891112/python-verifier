@@ -9,7 +9,6 @@ from colorama import Fore
 
 
 def setup():
-    p = os.getcwd()
     d_name = "TESTS"
     counter = 1
     while os.path.isdir(d_name):
@@ -24,7 +23,11 @@ def setup():
     file2.close()
 
     return dir_path
+
+
+#-----test read_file() ----------------------------------
 def test_read_file_correct(path):
+
     content=fm.read_file(path+r"\test_file1.txt")
     assert content=="Hello World"
 
@@ -36,13 +39,13 @@ def test_read_file_empty(path):
     assert content==""
 
 #--------Test create_file - all 4 tested, they all do what they should-------------
-def test_create_file1(path):
+def test_create_file_create(path):
 
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
     assert res == True
     
-def test_create_file2(path):
+def test_create_file_empty(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath)
     assert res == True
@@ -50,7 +53,7 @@ def test_create_file2(path):
         lines = f.read()
     assert lines == ""
 
-def test_create_file21(path):
+def test_create_file_same_content(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
     assert res == True
@@ -59,13 +62,13 @@ def test_create_file21(path):
     assert lines == "content is not empty"
 
 
-def test_create_file3(path):
+def test_create_file_invalid_name(path):
     filepath = 123
     res = fm.create_file(filepath)
     assert res == False
 
-#--------End of Test create_file -----------------------------------
 
+#--------Test delete_file() -----------------------------------
 
 def test_delete_file_true(path):
     fm.delete_file(path + fr"TESTS\test_file1.txt")    # dynamic concerning if a file already exists
@@ -86,7 +89,8 @@ def test_delete_file_dir(path):     # False if path leads to a folder instead of
     res = fm.delete_file(path + fr"TESTS")
     assert res == False
 
-def teardown(directory = ''):
+#-----teardown()
+def teardown(directory):
     '''
     deletes the directory, returns None
     '''
@@ -137,7 +141,7 @@ def get_testname():
     '''
     if len(sys.argv) < 2:
         return "test_"
-    elif len(sys.argv == 3):
+    elif len(sys.argv) == 3:
         code = sys.argv[1]
         pattern = sys.argv[2]
         if code == '-s' or code == '--select':
