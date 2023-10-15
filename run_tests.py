@@ -36,15 +36,15 @@ def test_read_file3(path):
     assert content==""
 
 #--------Test create_file - all 4 tested, they all do what they should-------------
-def test_create_file1(cwd_path):
+def test_create_file1(path):
 
-    filepath = cwd_path + "/create.txt"
+    filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
     print("1 success")
     assert res == True
     
-def test_create_file2(cwd_path):
-    filepath = cwd_path + "/create.txt"
+def test_create_file2(path):
+    filepath = path + "/create.txt"
     res = fm.create_file(filepath)
     print("2 success")
     assert res == True
@@ -52,8 +52,8 @@ def test_create_file2(cwd_path):
         lines = f.read()
     assert lines == ""
 
-def test_create_file21(cwd_path):
-    filepath = cwd_path + "/create.txt"
+def test_create_file21(path):
+    filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
     print("21 success")
     assert res == True
@@ -62,7 +62,7 @@ def test_create_file21(cwd_path):
     assert lines == "content is not empty"
 
 
-def test_create_file3(cwd_path):
+def test_create_file3(path):
     filepath = 123
     res = fm.create_file(filepath)
     print("3 success")
@@ -70,7 +70,25 @@ def test_create_file3(cwd_path):
 
 #--------End of Test create_file -----------------------------------
 
-    
+
+def test_delete_file_true(path):
+    fm.delete_file(path + fr"TESTS\test_file1.txt")    # dynamic concerning if a file already exists
+    assert os.path.exists(path + fr"TESTS\test_file1.txt") == False
+
+def test_delete_file_perm_err(path):    #exits with PermissionError
+    path = os.getcwd()
+    os.chmod(path + fr"TESTS\test_file1.txt", 0o444)
+    res = fm.delete_file(path + fr"TESTS\test_file1.txt")
+    #os.chmod(path + fr"TESTS\test_file1.txt", 0o644)
+    assert os.path.exists(path + fr"TESTS\test_file1.txt") == True
+
+def test_delete_file_false_input(path):
+    fm.delete_file(path + fr"TESTS\test_file.txt")
+    assert os.path.exists(path + fr"TESTS\test_file1.txt") == True
+
+def test_delete_file_dir(path):     # False if path leads to a folder instead of a file
+    res = fm.delete_file(path + fr"TESTS")
+    assert res == False
 
 def teardown(directory = ''):
     '''
@@ -89,7 +107,7 @@ def run_tests():
         try:
             cwd_path = setup()
             st = time.time()
-            test()
+            test(cwd_path)
             results["pass"] += 1
         except AssertionError:
             results["fail"] = results["fail"] + 1
