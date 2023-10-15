@@ -36,14 +36,14 @@ def test_read_file3(path):
     assert content==""
 
 #--------Test create_file - all 4 tested, they all do what they should-------------
-def test_create_file1(path):
+def test_create_file_create(path):
 
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
     print("1 success")
     assert res == True
     
-def test_create_file2(path):
+def test_create_file_empty(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath)
     print("2 success")
@@ -52,7 +52,7 @@ def test_create_file2(path):
         lines = f.read()
     assert lines == ""
 
-def test_create_file21(path):
+def test_create_file_same_content(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
     print("21 success")
@@ -62,7 +62,7 @@ def test_create_file21(path):
     assert lines == "content is not empty"
 
 
-def test_create_file3(path):
+def test_create_file_invalid_name(path):
     filepath = 123
     res = fm.create_file(filepath)
     print("3 success")
@@ -90,7 +90,7 @@ def test_delete_file_dir(path):     # False if path leads to a folder instead of
     res = fm.delete_file(path + fr"TESTS")
     assert res == False
 
-def teardown(directory = ''):
+def teardown(directory):
     '''
     deletes the directory, returns None
     '''
@@ -133,7 +133,7 @@ def get_testname():
     '''
     if len(sys.argv) < 2:
         return "test_"
-    elif len(sys.argv == 3):
+    elif len(sys.argv) == 3:
         code = sys.argv[1]
         pattern = sys.argv[2]
         if code == '-s' or code == '--select':
