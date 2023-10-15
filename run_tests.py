@@ -9,7 +9,6 @@ import sys
 
 
 def setup():
-    p = os.getcwd()
     d_name = "TESTS"
     counter = 1
     while os.path.isdir(d_name):
@@ -24,6 +23,8 @@ def setup():
     file2.close()
 
     return dir_path
+
+#-----test read_file() ----------------------------------
 def test_read_file1(path):
     content=fm.read_file(path+r"\test_file1.txt")
     assert content=="Hello World"
@@ -68,8 +69,8 @@ def test_create_file_invalid_name(path):
     print("3 success")
     assert res == False
 
-#--------End of Test create_file -----------------------------------
 
+#--------Test delete_file() -----------------------------------
 
 def test_delete_file_true(path):
     fm.delete_file(path + fr"TESTS\test_file1.txt")    # dynamic concerning if a file already exists
@@ -90,6 +91,7 @@ def test_delete_file_dir(path):     # False if path leads to a folder instead of
     res = fm.delete_file(path + fr"TESTS")
     assert res == False
 
+#-----teardown()
 def teardown(directory):
     '''
     deletes the directory, returns None
