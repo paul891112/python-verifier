@@ -41,6 +41,11 @@ def test_read_file_empty(path):
     res = fm.read_file(path + r"\test_file2.txt")
     assert res == ""
 
+def test_read_file_error(path):
+    res = fm.read_file(123)
+    assert res == None
+
+
 
 # --------Test create_file - all 4 tested, they all do what they should-------------
 def test_create_file_create(path):
