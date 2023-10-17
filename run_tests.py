@@ -1,9 +1,10 @@
-#2-3 tests for each function
+# 2-3 tests for each function
 
 import os
 import file_manager as fm
 import time
 import shutil
+from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR
 import sys
 from colorama import Fore
 
@@ -15,36 +16,38 @@ def setup():
         d_name = d_name[:5] + str(counter)
         counter += 1
     os.makedirs(d_name)
-    dir_path= os.getcwd()+fr"\{d_name}"
-    with open(dir_path+r"\test_file1.txt","w") as file1:
+    dir_path = os.getcwd() + fr"\{d_name}"
+    with open(dir_path + r"\test_file1.txt", "w") as file1:
         file1.write("Hello World")
 
-    file2=open(dir_path+r"\test_file2.txt","w")
+    file2 = open(dir_path + r"\test_file2.txt", "w")
     file2.close()
 
     return dir_path
 
 
-#-----test read_file() ----------------------------------
+# -----test read_file() ----------------------------------
 def test_read_file_correct(path):
+    content = fm.read_file(path + r"\test_file1.txt")
+    assert content == "Hello World"
 
-    content=fm.read_file(path+r"\test_file1.txt")
-    assert content=="Hello World"
 
 def test_read_file_None(path):
-    assert fm.read_file(path+r"\NonExistenFile.txt")==None
+    assert fm.read_file(path + r"\NonExistenFile.txt") == None
+
 
 def test_read_file_empty(path):
-    content=fm.read_file(path+r"\test_file2.txt")
-    assert content==""
+    content = fm.read_file(path + r"\test_file2.txt")
+    assert content == ""
 
-#--------Test create_file - all 4 tested, they all do what they should-------------
+
+# --------Test create_file - all 4 tested, they all do what they should-------------
 def test_create_file_create(path):
-
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
     assert res == True
-    
+
+
 def test_create_file_empty(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath)
@@ -52,6 +55,7 @@ def test_create_file_empty(path):
     with open(filepath, 'r') as f:
         lines = f.read()
     assert lines == ""
+
 
 def test_create_file_same_content(path):
     filepath = path + "/create.txt"
@@ -68,28 +72,46 @@ def test_create_file_invalid_name(path):
     assert res == False
 
 
-#--------Test delete_file() -----------------------------------
+# --------Test write_file() -----------------------------------
 
-def test_delete_file_true(path):
-    fm.delete_file(path + fr"TESTS\test_file1.txt")    # dynamic concerning if a file already exists
-    assert os.path.exists(path + fr"TESTS\test_file1.txt") == False
+def test_write_file_true(path):  # Successfully wrote the content -> True
+    res = fm.write_file(path + fr"\test_file1.txt", "New content")
+    assert res == True
+    with open(filepath, 'r') as f:
+        lines = f.read()
+    assert lines == "New content"
 
-def test_delete_file_perm_err(path):    #exits with PermissionError
-    path = os.getcwd()
-    os.chmod(path + fr"TESTS\test_file1.txt", 0o444)
-    res = fm.delete_file(path + fr"TESTS\test_file1.txt")
-    #os.chmod(path + fr"TESTS\test_file1.txt", 0o644)
-    assert os.path.exists(path + fr"TESTS\test_file1.txt") == True
 
-def test_delete_file_false_input(path):
-    fm.delete_file(path + fr"TESTS\test_file.txt")
-    assert os.path.exists(path + fr"TESTS\test_file1.txt") == True
-
-def test_delete_file_dir(path):     # False if path leads to a folder instead of a file
-    res = fm.delete_file(path + fr"TESTS")
+def test_write_file_integers_false(path):  # Content is a integer instead of a string -> False
+    res = fm.write_file(path + fr"\test_file.txt", 123)
     assert res == False
 
-#-----teardown()
+
+# --------Test delete_file() -----------------------------------
+
+def test_delete_file_true(path):
+    res = fm.delete_file(path + fr"\test_file1.txt")
+    assert res == False
+
+
+def test_delete_file_false_input(path):  # File does not exists, error has to appear
+    res = fm.delete_file(path + fr"\WRONG_FILENAME.txt")
+    assert res == False
+
+
+def test_delete_file_perm_err(path):  # Exits with PermissionError
+    os.chmod(path + fr"\test_file1.txt", S_IREAD | S_IRGRP | S_IROTH)
+    res = fm.delete_file(path + fr"\test_file1.txt")
+    assert res == False
+    os.chmod(path + fr"\test_file1.txt", S_IWUSR | S_IREAD)
+
+
+def test_delete_file_dir(path):  # False if path leads to a folder instead of a file
+    res = fm.delete_file(path)
+    assert res == False
+
+
+# -----teardown()
 def teardown(directory):
     '''
     deletes the directory, returns None
@@ -97,38 +119,38 @@ def teardown(directory):
     shutil.rmtree(directory)
 
 
-#---------11.10-------------------------------------------------
+# ---------11.10-------------------------------------------------
 
 def run_tests():
-    results = {"pass":0, "fail":0, "error":0}
-    prefix = get_testname() # returns the pattern of testname
+    results = {"pass": 0, "fail": 0, "error": 0}
+    prefix = get_testname()  # returns the pattern of testname
     all_tests = find_tests(prefix)
     for test in all_tests:
-        comment=""
+        comment = ""
         try:
             cwd_path = setup()
             st = time.time()
             test(cwd_path)
             results["pass"] += 1
-            comment+=Fore.GREEN+"pass"
+            comment += Fore.GREEN + "pass"
         except AssertionError:
             results["fail"] = results["fail"] + 1
-            comment+=Fore.RED+"fail"
+            comment += Fore.RED + "fail"
         except Exception:
             results["error"] += 1
-            comment+=Fore.LIGHTYELLOW_EX+"error"
+            comment += Fore.LIGHTYELLOW_EX + "error"
         finally:
             et = time.time()
-            t=(et-st)*1000
-            #print("Testing time: ", et-st)
+            t = (et - st) * 1000
+            # print("Testing time: ", et-st)
             teardown(cwd_path)
-            print(Fore.LIGHTWHITE_EX+f"Test: {test} ran in {round(t,2)} ms, status: {comment}")
-    print(Fore.LIGHTWHITE_EX+"#------Final Status------#")
-    print(Fore.GREEN+f"pass: {results['pass']}")
+            print(Fore.LIGHTWHITE_EX + f"Test: {test} ran in {round(t, 2)} ms, status: {comment}")
+    print(Fore.LIGHTWHITE_EX + "#------Final Status------#")
+    print(Fore.GREEN + f"pass: {results['pass']}")
     print(Fore.LIGHTYELLOW_EX + f"error: {results['error']}")
-    print(Fore.RED+f"fail: {results['fail']}")
+    print(Fore.RED + f"fail: {results['fail']}")
 
-    
+
 def get_testname():
     '''
     Handles the -s or --select.
@@ -152,13 +174,13 @@ def get_testname():
         raise Exception("Usage: run_tests.py -s pattern or runtests.py --select pattern")
 
 
-
 def find_tests(prefix):
     tests = []
     for (name, func) in globals().items():
         if prefix in name:
             tests.append(func)
     return tests
+
 
 def main():
     run_tests()
@@ -167,4 +189,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-#------end of 11.10------------------------------------------
+# ------end of 11.10------------------------------------------
