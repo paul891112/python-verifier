@@ -28,17 +28,18 @@ def setup():
 
 # -----test read_file() ----------------------------------
 def test_read_file_correct(path):
-    content = fm.read_file(path + r"\test_file1.txt")
-    assert content == "Hello World"
+    res = fm.read_file(path + r"\test_file1.txt")
+    assert res == "Hello World"
 
 
 def test_read_file_None(path):
-    assert fm.read_file(path + r"\NonExistenFile.txt") == None
+    res = fm.read_file(path + r"\NonExistentFile.txt")
+    assert res == None
 
 
 def test_read_file_empty(path):
-    content = fm.read_file(path + r"\test_file2.txt")
-    assert content == ""
+    res = fm.read_file(path + r"\test_file2.txt")
+    assert res == ""
 
 
 # --------Test create_file - all 4 tested, they all do what they should-------------
@@ -77,7 +78,7 @@ def test_create_file_invalid_name(path):
 def test_write_file_true(path):  # Successfully wrote the content -> True
     res = fm.write_file(path + fr"\test_file1.txt", "New content")
     assert res == True
-    with open(filepath, 'r') as f:
+    with open(path + fr"\test_file1.txt", 'r') as f:
         lines = f.read()
     assert lines == "New content"
 
@@ -91,7 +92,7 @@ def test_write_file_integers_false(path):  # Content is a integer instead of a s
 
 def test_delete_file_true(path):
     res = fm.delete_file(path + fr"\test_file1.txt")
-    assert res == False
+    assert res == True
 
 
 def test_delete_file_false_input(path):  # File does not exists, error has to appear
@@ -127,12 +128,14 @@ def run_tests():
     all_tests = find_tests(prefix)
     for test in all_tests:
         comment = ""
+        cwd_path = setup()
+        st = time.time()
         try:
-            cwd_path = setup()
-            st = time.time()
+
             test(cwd_path)
             results["pass"] += 1
             comment += Fore.GREEN + "pass"
+            comment+=Fore.WHITE
         except AssertionError:
             results["fail"] = results["fail"] + 1
             comment += Fore.RED + "fail"
@@ -144,11 +147,12 @@ def run_tests():
             t = (et - st) * 1000
             # print("Testing time: ", et-st)
             teardown(cwd_path)
-            print(Fore.LIGHTWHITE_EX + f"Test: {test} ran in {round(t, 2)} ms, status: {comment}")
+            print(Fore.LIGHTWHITE_EX + f"Test: {test.__name__} ran in {round(t, 2)} ms, status: {comment}")
     print(Fore.LIGHTWHITE_EX + "#------Final Status------#")
     print(Fore.GREEN + f"pass: {results['pass']}")
     print(Fore.LIGHTYELLOW_EX + f"error: {results['error']}")
     print(Fore.RED + f"fail: {results['fail']}")
+    comment+=Fore.WHITE
 
 
 def get_testname():
