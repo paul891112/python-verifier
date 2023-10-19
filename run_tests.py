@@ -8,7 +8,7 @@ from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR
 import sys
 from colorama import Fore
 
-
+# -------- setup() -------- #
 def setup():
     d_name = "TESTS"
     counter = 1
@@ -26,7 +26,7 @@ def setup():
     return dir_path
 
 
-# -----test read_file() ----------------------------------
+# -------- test_read_file() -------- #
 def test_read_file_correct(path):
     res = fm.read_file(path + r"\test_file1.txt")
     assert res == "Hello World"
@@ -47,7 +47,7 @@ def test_read_file_error(path):
 
 
 
-# --------Test create_file - all 4 tested, they all do what they should-------------
+# -------- test create_file() -------- #
 def test_create_file_create(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
@@ -78,58 +78,53 @@ def test_create_file_invalid_name(path):
     assert res == False
 
 
-# --------Test write_file() -----------------------------------
+# -------- test_write_file() -------- #
 
-def test_write_file_true(path):  # Successfully wrote the content -> True
-    res = fm.write_file(path + fr"\test_file1.txt", "New content")
+def test_write_file_true(path):
+    res = fm.write_file(path + r"\test_file1.txt", "New content")
     assert res == True
-    with open(path + fr"\test_file1.txt", 'r') as f:
+    with open(path + r"\test_file1.txt", 'r') as f:
         lines = f.read()
     assert lines == "New content"
 
 
-def test_write_file_integers_false(path):  # Content is a integer instead of a string -> False
-    res = fm.write_file(path + fr"\test_file.txt", 123)
+def test_write_file_integers_false(path):
+    res = fm.write_file(path + r"\test_file.txt", 123)
     assert res == False
 
 
-# --------Test delete_file() -----------------------------------
+# -------- test_delete_file() -------- #
 
 def test_delete_file_true(path):
-    res = fm.delete_file(path + fr"\test_file1.txt")
+    res = fm.delete_file(path + r"\test_file1.txt")
     assert res == True
 
 
-def test_delete_file_false_input(path):  # File does not exists, error has to appear
-    res = fm.delete_file(path + fr"\WRONG_FILENAME.txt")
+def test_delete_file_false_input(path):
+    res = fm.delete_file(path + r"\WRONG_FILENAME.txt")
     assert res == False
 
 
-def test_delete_file_perm_err(path):  # Exits with PermissionError
-    os.chmod(path + fr"\test_file1.txt", S_IREAD | S_IRGRP | S_IROTH)
-    res = fm.delete_file(path + fr"\test_file1.txt")
+def test_delete_file_perm_err(path):
+    os.chmod(path + r"\test_file1.txt", S_IREAD | S_IRGRP | S_IROTH)
+    res = fm.delete_file(path + r"\test_file1.txt")
     assert res == False
-    os.chmod(path + fr"\test_file1.txt", S_IWUSR | S_IREAD)
+    os.chmod(path + r"\test_file1.txt", S_IWUSR | S_IREAD)
 
 
-def test_delete_file_dir(path):  # False if path leads to a folder instead of a file
+def test_delete_file_dir(path):
     res = fm.delete_file(path)
     assert res == False
 
 
-# -----teardown()
+# -------- teardown() -------- #
 def teardown(directory):
-    '''
-    deletes the directory, returns None
-    '''
     shutil.rmtree(directory)
 
-
-# ---------11.10-------------------------------------------------
-
+# -------- run_tests() --------#
 def run_tests():
     results = {"pass": 0, "fail": 0, "error": 0}
-    prefix = get_testname()  # returns the pattern of testname
+    prefix = get_testname()
     all_tests = find_tests(prefix)
     for test in all_tests:
         comment = ""
@@ -138,21 +133,22 @@ def run_tests():
         try:
 
             test(cwd_path)
+            et = time.time()
             results["pass"] += 1
             comment += Fore.GREEN + "pass"
             comment+=Fore.WHITE
         except AssertionError:
+            et = time.time()
             results["fail"] = results["fail"] + 1
             comment += Fore.RED + "fail"
         except Exception:
+            et = time.time()
             results["error"] += 1
             comment += Fore.LIGHTYELLOW_EX + "error"
         finally:
-            et = time.time()
             t = (et - st) * 1000
-            # print("Testing time: ", et-st)
             teardown(cwd_path)
-            print(Fore.LIGHTWHITE_EX + f"Test: {test.__name__} ran in {round(t, 2)} ms, status: {comment}")
+            print(Fore.LIGHTWHITE_EX + f"Test: {test.__name__} ran in {t:.2f} ms, status: {comment}")
     print(Fore.LIGHTWHITE_EX + "#------Final Status------#")
     print(Fore.GREEN + f"pass: {results['pass']}")
     print(Fore.LIGHTYELLOW_EX + f"error: {results['error']}")
@@ -160,16 +156,8 @@ def run_tests():
     comment+=Fore.WHITE
 
 
+# -------- get_testname() -------#
 def get_testname():
-    '''
-    Handles the -s or --select.
-
-    Args:
-        -
-
-    Returns:
-        str: "test_" if not specified, the pattern "PATTERN" after -s or --select, raises exception otherwise
-    '''
     if len(sys.argv) < 2:
         return "test_"
     elif len(sys.argv) == 3:
@@ -183,6 +171,7 @@ def get_testname():
         raise Exception("Usage: run_tests.py -s pattern or runtests.py --select pattern")
 
 
+# -------- find_tests() -------- #
 def find_tests(prefix):
     tests = []
     for (name, func) in globals().items():
@@ -191,6 +180,7 @@ def find_tests(prefix):
     return tests
 
 
+# -------- main() --------- #
 def main():
     run_tests()
 
@@ -198,4 +188,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-# ------end of 11.10------------------------------------------
