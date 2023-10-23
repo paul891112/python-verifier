@@ -9,6 +9,7 @@ import sys
 from colorama import Fore
 
 # -------- setup() -------- #
+
 def setup():
     d_name = "TESTS"
     counter = 1
@@ -27,6 +28,7 @@ def setup():
 
 
 # -------- test_read_file() -------- #
+
 def test_read_file_correct(path):
     res = fm.read_file(path + r"\test_file1.txt")
     assert res == "Hello World"
@@ -41,6 +43,7 @@ def test_read_file_empty(path):
     res = fm.read_file(path + r"\test_file2.txt")
     assert res == ""
 
+
 def test_read_file_error(path):
     res = fm.read_file(123)
     assert res == None
@@ -48,6 +51,7 @@ def test_read_file_error(path):
 
 
 # -------- test create_file() -------- #
+
 def test_create_file_create(path):
     filepath = path + "/create.txt"
     res = fm.create_file(filepath, "content is not empty")
@@ -83,6 +87,11 @@ def test_create_file_invalid_name(path):
 def test_write_file_true(path):
     res = fm.write_file(path + r"\test_file1.txt", "New content")
     assert res == True
+
+
+def test_write_file_correct_content(path):
+    res = fm.write_file(path + r"\test_file1.txt", "New content")
+    assert res == True
     with open(path + r"\test_file1.txt", 'r') as f:
         lines = f.read()
     assert lines == "New content"
@@ -98,6 +107,13 @@ def test_write_file_integers_false(path):
 def test_delete_file_true(path):
     res = fm.delete_file(path + r"\test_file1.txt")
     assert res == True
+
+
+def test_delete_file_correct_deletion(path):
+    res = fm.delete_file(path + r"\test_file1.txt")
+    assert res == True
+    ex = os.path.exists(path + r"\test_file1.txt")
+    assert ex == False
 
 
 def test_delete_file_false_input(path):
@@ -118,10 +134,13 @@ def test_delete_file_dir(path):
 
 
 # -------- teardown() -------- #
+
 def teardown(directory):
     shutil.rmtree(directory)
 
+
 # -------- run_tests() --------#
+
 def run_tests():
     results = {"pass": 0, "fail": 0, "error": 0}
     prefix = get_testname()
@@ -157,6 +176,7 @@ def run_tests():
 
 
 # -------- get_testname() -------#
+
 def get_testname():
     if len(sys.argv) < 2:
         return "test_"
@@ -172,6 +192,7 @@ def get_testname():
 
 
 # -------- find_tests() -------- #
+
 def find_tests(prefix):
     tests = []
     for (name, func) in globals().items():
@@ -181,10 +202,10 @@ def find_tests(prefix):
 
 
 # -------- main() --------- #
+
 def main():
     run_tests()
 
 
 if __name__ == "__main__":
     main()
-
