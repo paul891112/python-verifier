@@ -1,4 +1,4 @@
-# 2-3 tests for each function
+
 
 import os
 import file_manager as fm
@@ -139,7 +139,7 @@ def teardown(directory):
     shutil.rmtree(directory)
 
 
-# -------- run_tests() --------#
+# -------- run_tests() -------- #
 
 def run_tests():
     results = {"pass": 0, "fail": 0, "error": 0}
@@ -175,7 +175,7 @@ def run_tests():
     comment+=Fore.WHITE
 
 
-# -------- get_testname() -------#
+# -------- get_testname() ------- #
 
 def get_testname():
     if len(sys.argv) < 2:
