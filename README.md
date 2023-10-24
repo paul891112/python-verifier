@@ -95,9 +95,9 @@ To test the "create_file()" function, we want to consider the following four cas
 4. If an invalid type for file path is passed, the function should return "False". (test_create_file_invalid_name)
 
 Test 1 is straightforward. The setup function gives the path of the created directory. A file with the file name "create.txt" and the path from setup is created by "create_file". The test checks if the return value of the test is "True".
-Test 3 calls the "create_file" function with the parameter "" (parameter which determines the content) and checks with the "open" function and the parameter "r" (read), whether the file has actually been created and is empty.
+Test 2 calls the "create_file" function with the parameter "" (parameter which determines the content) and checks with the "open" function and the parameter "r" (read), whether the file has actually been created and is empty.
 Analogously to Test 2, Test 3 calls the "create_file" function with the parameter "content is not empty" and checks with the "open" function and the parameter "r" (read), whether the file has actually been created and has the expected content.
-The fourth test calls the "create_file" function with the invalid parameter "123" (as an integer, not a string, so without quotation marks) and excepts the return value "False".
+Test 4 calls the "create_file" function with the invalid parameter "123" (as an integer, not a string, so without quotation marks) and excepts the return value "False".
 A correct implementation of the "create_file()" function in filemanager.py should pass all the tests mentioned above.
 
 
